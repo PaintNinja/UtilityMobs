@@ -1,11 +1,11 @@
 package toast.utilityMobs.block;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.block.Blocks;
+import net.minecraft.item.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import toast.utilityMobs._UtilityMobs;
@@ -58,7 +58,7 @@ public class EntityAnvilGolem extends EntityContainerGolem
 
     /// Opens this block golem's GUI.
     @Override
-    public boolean openGUI(EntityPlayer player) {
+    public boolean openGUI(PlayerEntity player) {
         if (!this.worldObj.isRemote) {
             GuiHelper.displayGUIAnvil(player, this);
         }
@@ -75,14 +75,14 @@ public class EntityAnvilGolem extends EntityContainerGolem
 
     /// Saves this entity to NBT.
     @Override
-    public void writeEntityToNBT(NBTTagCompound tag) {
+    public void writeEntityToNBT(CompoundNBT tag) {
         super.writeEntityToNBT(tag);
         tag.setByte("Damage", (byte)this.getDamage());
     }
 
     /// Loads this entity from NBT.
     @Override
-    public void readEntityFromNBT(NBTTagCompound tag) {
+    public void readEntityFromNBT(CompoundNBT tag) {
         super.readEntityFromNBT(tag);
         this.setDamage(tag.getByte("Damage"));
     }

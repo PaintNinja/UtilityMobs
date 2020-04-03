@@ -1,9 +1,9 @@
 package toast.utilityMobs.client.model;
 
-import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.model.ModelRenderer;
+import net.minecraft.client.renderer.model.Model;
+import net.minecraft.client.renderer.model.ModelRenderer;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 
 import org.lwjgl.opengl.GL11;
 
@@ -14,7 +14,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class ModelChestGolem extends ModelBase
+public class ModelChestGolem extends Model
 {
     public ModelRenderer legFrontLeft;
     public ModelRenderer legFrontRight;
@@ -85,7 +85,7 @@ public class ModelChestGolem extends ModelBase
 
     // Used for easily adding entity-dependent animations.
     @Override
-    public void setLivingAnimations(EntityLivingBase entity, float time, float moveSpeed, float partialTicks) {
+    public void setLivingAnimations(LivingEntity entity, float time, float moveSpeed, float partialTicks) {
         EntityChestGolem golem = (EntityChestGolem)entity;
         float angle = 1.0F - golem.prevLidAngle - (golem.lidAngle - golem.prevLidAngle) * partialTicks;
         angle = 1.0F - angle * angle * angle;

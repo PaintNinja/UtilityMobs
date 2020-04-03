@@ -1,8 +1,8 @@
 package toast.utilityMobs.network;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.network.play.server.S2DPacketOpenWindow;
 import net.minecraft.world.World;
@@ -27,7 +27,7 @@ public class GuiHelper implements IGuiHandler
      * @see cpw.mods.fml.common.network.IGuiHandler#getServerGuiElement(int, net.minecraft.entity.player.EntityPlayer, net.minecraft.world.World, int, int, int)
      */
     @Override
-    public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
+    public Object getServerGuiElement(int ID, PlayerEntity player, World world, int x, int y, int z) {
         Entity entity = world.getEntityByID(ID);
         if (entity instanceof EntitySteamGolem)
             return new ContainerSteamGolem(player.inventory, (EntitySteamGolem) entity);
@@ -40,7 +40,7 @@ public class GuiHelper implements IGuiHandler
      * @see cpw.mods.fml.common.network.IGuiHandler#getClientGuiElement(int, net.minecraft.entity.player.EntityPlayer, net.minecraft.world.World, int, int, int)
      */
     @Override
-    public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
+    public Object getClientGuiElement(int ID, PlayerEntity player, World world, int x, int y, int z) {
         Entity entity = world.getEntityByID(ID);
         if (entity instanceof EntitySteamGolem)
             return new GuiSteamGolem(player.inventory, (EntitySteamGolem) entity);
@@ -50,41 +50,41 @@ public class GuiHelper implements IGuiHandler
     }
 
     /// Opens an anvil GUI using a container golem instead of a block position.
-    public static void displayGUIAnvil(EntityPlayer player, EntityAnvilGolem golem) {
-        if (player instanceof EntityPlayerMP) {
-            ((EntityPlayerMP)player).getNextWindowId();
-            ((EntityPlayerMP)player).playerNetServerHandler.sendPacket(new S2DPacketOpenWindow(((EntityPlayerMP)player).currentWindowId, 8, "Repairing", 9, true));
+    public static void displayGUIAnvil(PlayerEntity player, EntityAnvilGolem golem) {
+        if (player instanceof ServerPlayerEntity) {
+            ((ServerPlayerEntity)player).getNextWindowId();
+            ((ServerPlayerEntity)player).playerNetServerHandler.sendPacket(new S2DPacketOpenWindow(((ServerPlayerEntity)player).currentWindowId, 8, "Repairing", 9, true));
             player.openContainer = new ContainerAnvilGolem(player.inventory, golem, player);
-            player.openContainer.windowId = ((EntityPlayerMP)player).currentWindowId;
-            player.openContainer.addCraftingToCrafters((EntityPlayerMP)player);
+            player.openContainer.windowId = ((ServerPlayerEntity)player).currentWindowId;
+            player.openContainer.addCraftingToCrafters((ServerPlayerEntity)player);
         }
     }
 
     /// Opens a furnace GUI using a furnace golem instead of a furnace tile entity.
-    public static void displayGUIFurnace(EntityPlayer player, EntityFurnaceGolem golem) {
-        if (player instanceof EntityPlayerMP) {
-            ((EntityPlayerMP)player).getNextWindowId();
-            ((EntityPlayerMP)player).playerNetServerHandler.sendPacket(new S2DPacketOpenWindow(((EntityPlayerMP)player).currentWindowId, 2, golem.getInventoryName(), golem.getSizeInventory(), golem.hasCustomInventoryName()));
+    public static void displayGUIFurnace(PlayerEntity player, EntityFurnaceGolem golem) {
+        if (player instanceof ServerPlayerEntity) {
+            ((ServerPlayerEntity)player).getNextWindowId();
+            ((ServerPlayerEntity)player).playerNetServerHandler.sendPacket(new S2DPacketOpenWindow(((ServerPlayerEntity)player).currentWindowId, 2, golem.getInventoryName(), golem.getSizeInventory(), golem.hasCustomInventoryName()));
             player.openContainer = new ContainerFurnaceGolem(player.inventory, golem);
-            player.openContainer.windowId = ((EntityPlayerMP)player).currentWindowId;
-            player.openContainer.addCraftingToCrafters((EntityPlayerMP)player);
+            player.openContainer.windowId = ((ServerPlayerEntity)player).currentWindowId;
+            player.openContainer.addCraftingToCrafters((ServerPlayerEntity)player);
         }
     }
 
     /// Opens a workbench GUI using a container golem instead of a block position.
-    public static void displayGUIWorkbench(EntityPlayer player, EntityContainerGolem golem) {
-        if (player instanceof EntityPlayerMP) {
-            ((EntityPlayerMP)player).getNextWindowId();
-            ((EntityPlayerMP)player).playerNetServerHandler.sendPacket(new S2DPacketOpenWindow(((EntityPlayerMP)player).currentWindowId, 1, "Crafting", 9, true));
+    public static void displayGUIWorkbench(PlayerEntity player, EntityContainerGolem golem) {
+        if (player instanceof ServerPlayerEntity) {
+            ((ServerPlayerEntity)player).getNextWindowId();
+            ((ServerPlayerEntity)player).playerNetServerHandler.sendPacket(new S2DPacketOpenWindow(((ServerPlayerEntity)player).currentWindowId, 1, "Crafting", 9, true));
             player.openContainer = new ContainerWorkbenchGolem(player.inventory, golem);
-            player.openContainer.windowId = ((EntityPlayerMP)player).currentWindowId;
-            player.openContainer.addCraftingToCrafters((EntityPlayerMP)player);
+            player.openContainer.windowId = ((ServerPlayerEntity)player).currentWindowId;
+            player.openContainer.addCraftingToCrafters((ServerPlayerEntity)player);
         }
     }
 
     // Opens a custom GUI based on the entity passed.
-    public static void displayGUICustom(EntityPlayer player, Entity golem) {
-        if (player instanceof EntityPlayerMP) {
+    public static void displayGUICustom(PlayerEntity player, Entity golem) {
+        if (player instanceof ServerPlayerEntity) {
             player.openGui(_UtilityMobs.MODID, golem.getEntityId(), player.worldObj, 0, 0, 0);
         }
     }

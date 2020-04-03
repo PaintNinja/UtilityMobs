@@ -1,8 +1,8 @@
 package toast.utilityMobs.block;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
@@ -31,12 +31,12 @@ public class ContainerAnvilGolemSlot extends Slot
      * Return whether this slot's stack can be taken from this slot.
      */
     @Override
-    public boolean canTakeStack(EntityPlayer player) {
+    public boolean canTakeStack(PlayerEntity player) {
         return (player.capabilities.isCreativeMode || player.experienceLevel >= this.anvilContainer.maximumCost) && this.anvilContainer.maximumCost > 0 && this.getHasStack();
     }
 
     @Override
-    public void onPickupFromSlot(EntityPlayer player, ItemStack itemStack) {
+    public void onPickupFromSlot(PlayerEntity player, ItemStack itemStack) {
         if (!player.capabilities.isCreativeMode)
         {
             player.addExperienceLevel(-this.anvilContainer.maximumCost);

@@ -1,8 +1,8 @@
 package toast.utilityMobs;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.projectile.EntityArrow;
-import net.minecraft.init.Items;
+import net.minecraft.entity.projectile.ArrowEntity;
+import net.minecraft.item.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
@@ -47,7 +47,7 @@ public enum EnumUpgrade
     }
 
     // Applies this arrow effect to the arrow and initializes arrow stats.
-    public void applyToArrow(EntityArrow arrow) {
+    public void applyToArrow(ArrowEntity arrow) {
         switch (this) {
             case EXPLOSIVE:
                 arrow.setDamage(arrow.getDamage() - 1.0);

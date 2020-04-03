@@ -1,13 +1,13 @@
 package toast.utilityMobs.ai;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.EntityAIBase;
 import toast.utilityMobs.turret.EntityTurretGolem;
 
 public class EntityAITurretAttack extends EntityAIBase
 {
     public final EntityTurretGolem golem;
-    public EntityLivingBase target;
+    public LivingEntity target;
 
     public EntityAITurretAttack(EntityTurretGolem entity) {
         this.golem = entity;
@@ -16,7 +16,7 @@ public class EntityAITurretAttack extends EntityAIBase
 
     @Override
     public boolean shouldExecute() {
-        EntityLivingBase entity = this.golem.getAttackTarget();
+        LivingEntity entity = this.golem.getAttackTarget();
         if (entity == null)
             return false;
         this.target = entity;

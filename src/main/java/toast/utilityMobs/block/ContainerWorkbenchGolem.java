@@ -1,7 +1,7 @@
 package toast.utilityMobs.block;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.ContainerWorkbench;
 
 public class ContainerWorkbenchGolem extends ContainerWorkbench
@@ -9,7 +9,7 @@ public class ContainerWorkbenchGolem extends ContainerWorkbench
     /// The golem being crafted on.
     public final EntityContainerGolem golem;
 
-    public ContainerWorkbenchGolem(InventoryPlayer inventory, EntityContainerGolem workbench) {
+    public ContainerWorkbenchGolem(PlayerInventory inventory, EntityContainerGolem workbench) {
         super(inventory, workbench.worldObj, (int)workbench.posX, (int)workbench.posY, (int)workbench.posZ);
         this.golem = workbench;
         this.golem.openInventory();
@@ -17,14 +17,14 @@ public class ContainerWorkbenchGolem extends ContainerWorkbench
 
     /// Callback for when the crafting gui is closed.
     @Override
-    public void onContainerClosed(EntityPlayer player) {
+    public void onContainerClosed(PlayerInventory player) {
         super.onContainerClosed(player);
         this.golem.closeInventory();
     }
 
     /// Returns true if this container can be opened by the player.
     @Override
-    public boolean canInteractWith(EntityPlayer player) {
+    public boolean canInteractWith(PlayerEntity player) {
         return this.golem.isUseableByPlayer(player);
     }
 }

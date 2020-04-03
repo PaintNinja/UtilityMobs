@@ -2,7 +2,7 @@ package toast.utilityMobs.client;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
-import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.client.entity.player.RemoteClientPlayerEntity;
 import net.minecraft.client.model.ModelZombie;
 import net.minecraft.item.ItemRecord;
 import net.minecraft.util.ResourceLocation;
@@ -102,7 +102,7 @@ public class ClientProxy extends CommonProxy
             this.packetCooldown--;
         }
         else {
-            EntityClientPlayerMP player = FMLClientHandler.instance().getClientPlayerEntity();
+            RemoteClientPlayerEntity player = FMLClientHandler.instance().getClientPlayerEntity();
             if (player != null && player.movementInput != null && player.movementInput.jump && player.ridingEntity instanceof EntityColossalGolem && ((EntityColossalGolem) player.ridingEntity).getAnimId() == 0) {
                 this.packetCooldown = 20;
                 _UtilityMobs.CHANNEL.sendToServer(new MessageUseGolem());

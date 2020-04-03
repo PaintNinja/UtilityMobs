@@ -1,11 +1,11 @@
 package toast.utilityMobs.ai;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBow;
-import net.minecraft.item.ItemFishingRod;
-import net.minecraft.item.ItemSnowball;
+import net.minecraft.item.BowItem;
+import net.minecraft.item.FishingRodItem;
+import net.minecraft.item.SnowballItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.pathfinding.PathEntity;
 import toast.utilityMobs.EntityGolemFishHook;
@@ -15,7 +15,7 @@ public class EntityAIWeaponAttack extends EntityAIBase
 {
     public final EntityUtilityGolem golem;
     public final double moveSpeed;
-    public EntityLivingBase target;
+    public LivingEntity target;
     public PathEntity path = null;
     public int pathDelay = 0;
     public int sightTime = 0;
@@ -31,12 +31,12 @@ public class EntityAIWeaponAttack extends EntityAIBase
 
     @Override
     public boolean shouldExecute() {
-        EntityLivingBase entity = this.golem.getAttackTarget();
+        LivingEntity entity = this.golem.getAttackTarget();
         if (entity == null)
             return false;
         this.target = entity;
         ItemStack weapon = this.golem.getEquipmentInSlot(0);
-        if (weapon != null && (this.isRangedWeapon(weapon) || weapon.getItem() instanceof ItemFishingRod))
+        if (weapon != null && (this.isRangedWeapon(weapon) || weapon.getItem() instanceof FishingRodItem))
             return true;
         this.path = this.golem.getNavigator().getPathToEntityLiving(this.target);
         return this.path != null;
@@ -91,7 +91,7 @@ public class EntityAIWeaponAttack extends EntityAIBase
                 return;
             this.golem.doRangedAttack(this.target);
             Item item = weapon.getItem();
-            if (item instanceof ItemBow) {
+            if (item instanceof BowItem) {
                 this.golem.golemAttackTime = 60;
             }
             else {
@@ -99,7 +99,7 @@ public class EntityAIWeaponAttack extends EntityAIBase
             }
         }
         else {
-            if (weapon != null && weapon.getItem() instanceof ItemFishingRod) {
+            if (weapon != null && weapon.getItem() instanceof FishingRodItem) {
                 if (this.rodTime > 0) {
                     this.rodTime--;
                 }
@@ -130,6 +130,6 @@ public class EntityAIWeaponAttack extends EntityAIBase
     }
 
     public boolean isRangedWeapon(ItemStack itemStack) {
-        return itemStack != null && (itemStack.getItem() instanceof ItemBow || itemStack.getItem() instanceof ItemSnowball);
+        return itemStack != null && (itemStack.getItem() instanceof BowItem || itemStack.getItem() instanceof SnowballItem);
     }
 }

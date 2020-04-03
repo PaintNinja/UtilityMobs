@@ -1,16 +1,16 @@
 package toast.utilityMobs.block;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.Slot;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 
 public class ContainerLanternGolem extends Container
 {
     private final EntityLanternGolem golem;
 
-    public ContainerLanternGolem(InventoryPlayer inventory, EntityLanternGolem lanternGolem) {
+    public ContainerLanternGolem(PlayerInventory inventory, EntityLanternGolem lanternGolem) {
         this.golem = lanternGolem;
         this.golem.openInventory();
         int i, j;
@@ -31,19 +31,19 @@ public class ContainerLanternGolem extends Container
 
     /// Callback for when the crafting gui is closed.
     @Override
-    public void onContainerClosed(EntityPlayer player) {
+    public void onContainerClosed(PlayerEntity player) {
         super.onContainerClosed(player);
         this.golem.closeInventory();
     }
 
     @Override
-    public boolean canInteractWith(EntityPlayer player) {
+    public boolean canInteractWith(PlayerEntity player) {
         return this.golem.isUseableByPlayer(player);
     }
 
     /// Called when a player shift-clicks on a slot.
     @Override
-    public ItemStack transferStackInSlot(EntityPlayer player, int slotIndex) {
+    public ItemStack transferStackInSlot(PlayerEntity player, int slotIndex) {
         ItemStack itemStack = null;
         Slot slot = (Slot)this.inventorySlots.get(slotIndex);
         if (slot != null && slot.getHasStack()) {

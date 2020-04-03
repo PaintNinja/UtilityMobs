@@ -1,8 +1,8 @@
 package toast.utilityMobs.block;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.inventory.InventoryEnderChest;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.block.Blocks;
+import net.minecraft.inventory.EnderChestInventory;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
@@ -57,9 +57,9 @@ public class EntityChestEnderGolem extends EntityChestGolem
 
     /// Opens this block golem's GUI.
     @Override
-    public boolean openGUI(EntityPlayer player) {
+    public boolean openGUI(PlayerEntity player) {
         if (!this.worldObj.isRemote) {
-            InventoryEnderChest inventory = player.getInventoryEnderChest();
+            EnderChestInventory inventory = player.getInventoryEnderChest();
             if (inventory != null) {
                 inventory.func_146031_a(new TileEntityEnderChestProxy(this)); // Sets this as a "tile entity" for the player's ender chests
                 player.displayGUIChest(inventory);

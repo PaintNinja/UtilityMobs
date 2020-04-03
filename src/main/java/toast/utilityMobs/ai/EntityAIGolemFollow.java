@@ -1,7 +1,7 @@
 package toast.utilityMobs.ai;
 
 import net.minecraft.entity.ai.EntityAIBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
 import toast.utilityMobs.golem.EntityUtilityGolem;
 
@@ -11,7 +11,7 @@ public class EntityAIGolemFollow extends EntityAIBase
     public double moveSpeed;
     public float minDistance, maxDistance;
 
-    public EntityPlayer owner;
+    public PlayerEntity owner;
     public int pathDelay = 0;
     public boolean avoidsWater;
 
@@ -26,7 +26,7 @@ public class EntityAIGolemFollow extends EntityAIBase
     /// Returns whether the EntityAIBase should begin execution.
     @Override
     public boolean shouldExecute() {
-        EntityPlayer player = this.golem.getOwner();
+        PlayerEntity player = this.golem.getOwner();
         if (player == null || this.golem.isSitting() || this.golem.getDistanceSqToEntity(player) < this.minDistance * this.minDistance)
             return false;
         this.owner = player;

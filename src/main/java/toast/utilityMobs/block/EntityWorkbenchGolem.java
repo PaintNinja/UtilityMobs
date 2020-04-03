@@ -1,7 +1,7 @@
 package toast.utilityMobs.block;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
@@ -25,7 +25,7 @@ public class EntityWorkbenchGolem extends EntityContainerGolem
 
     /// Opens this block golem's GUI.
     @Override
-    public boolean openGUI(EntityPlayer player) {
+    public boolean openGUI(PlayerEntity player) {
         if (!this.worldObj.isRemote) {
             GuiHelper.displayGUIWorkbench(player, this);
         }

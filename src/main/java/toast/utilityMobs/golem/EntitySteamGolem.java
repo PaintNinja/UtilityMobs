@@ -2,14 +2,14 @@ package toast.utilityMobs.golem;
 
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIWander;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.block.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.tileentity.TileEntityFurnace;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
+import net.minecraft.tileentity.FurnaceTileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import toast.utilityMobs.TargetHelper;
@@ -122,8 +122,8 @@ public class EntitySteamGolem extends EntityLargeGolem implements IInventory
     }
 
     @Override
-    public boolean interact(EntityPlayer player) {
-        if (this.canInteract(player) && !player.isSneaking()) {
+    public boolean interact(PlayerEntity player) {
+        if (this.canInteract(player) && !player.isCrouching()) {
             if (this.openGUI(player))
                 return true;
         }
@@ -131,7 +131,7 @@ public class EntitySteamGolem extends EntityLargeGolem implements IInventory
     }
 
     /// Opens this golem's GUI.
-    public boolean openGUI(EntityPlayer player) {
+    public boolean openGUI(PlayerEntity player) {
         if (!this.worldObj.isRemote) {
             GuiHelper.displayGUICustom(player, this);
         }
@@ -160,10 +160,10 @@ public class EntitySteamGolem extends EntityLargeGolem implements IInventory
         }
         if (!this.worldObj.isRemote) {
             // Load fuel from other inventory slots.
-            if (this.getStackInSlot(1) == null || TileEntityFurnace.getItemBurnTime(this.getStackInSlot(1)) <= 0) {
+            if (this.getStackInSlot(1) == null || FurnaceTileEntity.getItemBurnTime(this.getStackInSlot(1)) <= 0) {
                 ItemStack current = this.getStackInSlot(1);
                 for (int slot = 0; slot < this.contents.length; slot++) {
-                    if (slot != 1 && this.getStackInSlot(slot) != null && TileEntityFurnace.getItemBurnTime(this.getStackInSlot(slot)) > 0) {
+                    if (slot != 1 && this.getStackInSlot(slot) != null && FurnaceTileEntity.getItemBurnTime(this.getStackInSlot(slot)) > 0) {
                         this.setInventorySlotContents(1, this.getStackInSlot(slot));
                         this.setInventorySlotContents(slot, current);
                         break;
@@ -172,7 +172,7 @@ public class EntitySteamGolem extends EntityLargeGolem implements IInventory
             }
             // Burn fuel.
             if (this.burnTime == 0) {
-                this.maxBurnTime = this.burnTime = TileEntityFurnace.getItemBurnTime(this.getStackInSlot(1));
+                this.maxBurnTime = this.burnTime = FurnaceTileEntity.getItemBurnTime(this.getStackInSlot(1));
                 if (this.burnTime > 0 && this.getStackInSlot(1) != null) {
                     this.getStackInSlot(1).stackSize--;
                     if (this.getStackInSlot(1).stackSize == 0) {
@@ -191,12 +191,12 @@ public class EntitySteamGolem extends EntityLargeGolem implements IInventory
 
     /// Saves this entity to NBT.
     @Override
-    public void writeEntityToNBT(NBTTagCompound tag) {
+    public void writeEntityToNBT(CompoundNBT tag) {
         super.writeEntityToNBT(tag);
-        NBTTagList tagList = new NBTTagList();
+        ListNBT tagList = new ListNBT();
         for (int slot = 0; slot < this.contents.length; slot++) {
             if (this.contents[slot] != null) {
-                NBTTagCompound slotTag = new NBTTagCompound();
+                CompoundNBT slotTag = new CompoundNBT();
                 slotTag.setByte("Slot", (byte)slot);
                 this.contents[slot].writeToNBT(slotTag);
                 tagList.appendTag(slotTag);
@@ -209,12 +209,12 @@ public class EntitySteamGolem extends EntityLargeGolem implements IInventory
 
     /// Loads this entity from NBT.
     @Override
-    public void readEntityFromNBT(NBTTagCompound tag) {
+    public void readEntityFromNBT(CompoundNBT tag) {
         super.readEntityFromNBT(tag);
-        NBTTagList tagList = tag.getTagList("Items", tag.getId());
+        ListNBT tagList = tag.getTagList("Items", tag.getId());
         this.contents = new ItemStack[this.getSizeInventory()];
         for (int i = 0; i < tagList.tagCount(); i++) {
-            NBTTagCompound slotTag = tagList.getCompoundTagAt(i);
+            CompoundNBT slotTag = tagList.getCompoundTagAt(i);
             int slot = slotTag.getByte("Slot") & 255;
             if (slot >= 0 && slot < this.contents.length) {
                 this.contents[slot] = ItemStack.loadItemStackFromNBT(slotTag);
@@ -314,7 +314,7 @@ public class EntitySteamGolem extends EntityLargeGolem implements IInventory
      * @see net.minecraft.inventory.IInventory#isUseableByPlayer(net.minecraft.entity.player.EntityPlayer)
      */
     @Override
-    public boolean isUseableByPlayer(EntityPlayer player) {
+    public boolean isUseableByPlayer(PlayerEntity player) {
         return this.canInteract(player);
     }
 

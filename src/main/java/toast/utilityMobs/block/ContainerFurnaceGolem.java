@@ -1,14 +1,14 @@
 package toast.utilityMobs.block;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.ICrafting;
-import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.inventory.SlotFurnace;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
-import net.minecraft.tileentity.TileEntityFurnace;
+import net.minecraft.tileentity.FurnaceTileEntity;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -19,7 +19,7 @@ public class ContainerFurnaceGolem extends Container
     public int lastBurnTime = 0;
     public int lastItemBurnTime = 0;
 
-    public ContainerFurnaceGolem(InventoryPlayer inventory, EntityFurnaceGolem furnace) {
+    public ContainerFurnaceGolem(PlayerInventory inventory, EntityFurnaceGolem furnace) {
         this.golem = furnace;
         this.golem.openInventory();
         this.addSlotToContainer(new Slot(furnace, 0, 56, 17));
@@ -38,7 +38,7 @@ public class ContainerFurnaceGolem extends Container
 
     /// Callback for when the crafting gui is closed.
     @Override
-    public void onContainerClosed(EntityPlayer player) {
+    public void onContainerClosed(PlayerEntity player) {
         super.onContainerClosed(player);
         this.golem.closeInventory();
     }
@@ -89,13 +89,13 @@ public class ContainerFurnaceGolem extends Container
     }
 
     @Override
-    public boolean canInteractWith(EntityPlayer player) {
+    public boolean canInteractWith(PlayerEntity player) {
         return this.golem.isUseableByPlayer(player);
     }
 
     /// Called when a player shift-clicks on a slot.
     @Override
-    public ItemStack transferStackInSlot(EntityPlayer player, int slotIndex) {
+    public ItemStack transferStackInSlot(PlayerEntity player, int slotIndex) {
         ItemStack itemStack = null;
         Slot slot = (Slot)this.inventorySlots.get(slotIndex);
         if (slot != null && slot.getHasStack()) {
@@ -111,7 +111,7 @@ public class ContainerFurnaceGolem extends Container
                     if (!this.mergeItemStack(itemStackInSlot, 0, 1, false))
                         return null;
                 }
-                else if (TileEntityFurnace.isItemFuel(itemStackInSlot)) {
+                else if (FurnaceTileEntity.isItemFuel(itemStackInSlot)) {
                     if (!this.mergeItemStack(itemStackInSlot, 1, 2, false))
                         return null;
                 }

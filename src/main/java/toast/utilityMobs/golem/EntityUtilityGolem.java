@@ -6,27 +6,27 @@ import net.minecraft.block.material.Material;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.IEntityOwnable;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
 import net.minecraft.entity.ai.EntityAISwimming;
-import net.minecraft.entity.monster.EntityGolem;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.projectile.EntityArrow;
-import net.minecraft.entity.projectile.EntitySnowball;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
+import net.minecraft.entity.passive.GolemEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.ArrowEntity;
+import net.minecraft.block.Blocks;
+import net.minecraft.entity.projectile.SnowballEntity;
+import net.minecraft.item.Items;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemArmor;
-import net.minecraft.item.ItemBow;
-import net.minecraft.item.ItemShears;
+import net.minecraft.item.ArmorItem;
+import net.minecraft.item.BowItem;
+import net.minecraft.item.ShearsItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import toast.utilityMobs.EffectHelper;
@@ -35,7 +35,7 @@ import toast.utilityMobs.TargetHelper;
 import toast.utilityMobs.ai.EntityAIGolemSit;
 import toast.utilityMobs.colossal.EntityColossalGolem;
 
-public abstract class EntityUtilityGolem extends EntityGolem implements IEntityOwnable
+public abstract class EntityUtilityGolem extends GolemEntity implements IEntityOwnable
 {
     /// The texture for this class.
     public ResourceLocation texture = null;
@@ -118,9 +118,9 @@ public abstract class EntityUtilityGolem extends EntityGolem implements IEntityO
     public boolean attackEntityAsMob(Entity entity) {
         float attackDamage = (float)this.getEntityAttribute(SharedMonsterAttributes.attackDamage).getAttributeValue();
         int knockback = 0;
-        if (entity instanceof EntityLivingBase) {
-            attackDamage += EnchantmentHelper.getEnchantmentModifierLiving(this, (EntityLivingBase)entity);
-            knockback += EnchantmentHelper.getKnockbackModifier(this, (EntityLivingBase)entity);
+        if (entity instanceof LivingEntity) {
+            attackDamage += EnchantmentHelper.getEnchantmentModifierLiving(this, (LivingEntity)entity);
+            knockback += EnchantmentHelper.getKnockbackModifier(this, (LivingEntity)entity);
         }
 
         boolean hit = entity.attackEntityFrom(DamageSource.causeMobDamage(this), attackDamage);
@@ -154,8 +154,8 @@ public abstract class EntityUtilityGolem extends EntityGolem implements IEntityO
                 entity.setFire(fireAspect << 2);
             }
 
-            if (entity instanceof EntityLivingBase) {
-                EnchantmentHelper.func_151384_a((EntityLivingBase) entity, this); // Triggers hit entity's enchants.
+            if (entity instanceof LivingEntity) {
+                EnchantmentHelper.func_151384_a((LivingEntity) entity, this); // Triggers hit entity's enchants.
             }
             EnchantmentHelper.func_151385_b(this, entity); // Triggers attacker's enchants.
         }
@@ -206,11 +206,11 @@ public abstract class EntityUtilityGolem extends EntityGolem implements IEntityO
     }
 
     @Override
-    public boolean interact(EntityPlayer player) {
+    public boolean interact(PlayerEntity player) {
         if (!this.canInteract(player))
             return super.interact(player);
         ItemStack playerHeld = player.getEquipmentInSlot(0);
-        if (player.isSneaking() && playerHeld != null && playerHeld.getItem() instanceof ItemShears) {
+        if (player.isCrouching() && playerHeld != null && playerHeld.getItem() instanceof ShearsItem) {
             if (!this.worldObj.isRemote) {
                 float health = this.getHealth();
                 float maxHealth = this.getMaxHealth();
@@ -237,8 +237,8 @@ public abstract class EntityUtilityGolem extends EntityGolem implements IEntityO
         return super.interact(player);
     }
 
-    public boolean canInteract(EntityPlayer player) {
-        if (player.isSneaking() && player.getHeldItem() != null && player.getHeldItem().getItem() instanceof ItemShears)
+    public boolean canInteract(PlayerEntity player) {
+        if (player.isCrouching() && player.getHeldItem() != null && player.getHeldItem().getItem() instanceof ShearsItem)
             return this.targetHelper.playerHasPermission(player.getCommandSenderName(), this.getUsePermissions() | TargetHelper.PERMISSION_OPEN);
         return this.isEntityAlive() && this.targetHelper.playerHasPermission(player.getCommandSenderName(), this.getUsePermissions());
     }
@@ -256,8 +256,8 @@ public abstract class EntityUtilityGolem extends EntityGolem implements IEntityO
             return false;
         }
         int slot = 0;
-        if (itemStack.getItem() instanceof ItemArmor) {
-            slot = 4 - ((ItemArmor)itemStack.getItem()).armorType;
+        if (itemStack.getItem() instanceof ArmorItem) {
+            slot = 4 - ((ArmorItem)itemStack.getItem()).armorType;
         }
         return this.setEquipment(slot, itemStack);
     }
@@ -271,12 +271,12 @@ public abstract class EntityUtilityGolem extends EntityGolem implements IEntityO
     }
 
     /// Executes this golem's ranged attack.
-    public void doRangedAttack(EntityLivingBase target) {
+    public void doRangedAttack(LivingEntity target) {
         ItemStack held = this.getEquipmentInSlot(0);
         if (held == null)
             return;
-        else if (held.getItem() instanceof ItemBow) {
-            EntityArrow arrow = new EntityArrow(this.worldObj, this, target, 1.6F, 12.0F);
+        else if (held.getItem() instanceof BowItem) {
+            ArrowEntity arrow = new ArrowEntity(this.worldObj, this, target, 1.6F, 12.0F);
             this.targetHelper.setOwned(arrow);
             EnumUpgrade.DEFAULT.applyToArrow(arrow);
             this.playSound("random.bow", 1.0F, 1.0F / (this.rand.nextFloat() * 0.4F + 0.8F));
@@ -294,7 +294,7 @@ public abstract class EntityUtilityGolem extends EntityGolem implements IEntityO
             this.worldObj.spawnEntityInWorld(arrow);
         }
         else {
-            EntitySnowball snowball = new EntitySnowball(this.worldObj, this);
+            SnowballEntity snowball = new SnowballEntity(this.worldObj, this);
             this.targetHelper.setOwned(snowball);
             EnumUpgrade.DEFAULT.applyTo(snowball);
             double motionX = target.posX - this.posX;
@@ -318,7 +318,7 @@ public abstract class EntityUtilityGolem extends EntityGolem implements IEntityO
 
     /// Returns the owner entity.
     @Override
-    public EntityPlayer getOwner() {
+    public PlayerEntity getOwner() {
         return this.worldObj.getPlayerEntityByName(this.func_152113_b());
     }
 
@@ -336,15 +336,15 @@ public abstract class EntityUtilityGolem extends EntityGolem implements IEntityO
 
     @Override
     public Team getTeam() {
-        EntityLivingBase owner = this.getOwner();
+        LivingEntity owner = this.getOwner();
         if (owner != null)
             return owner.getTeam();
         return super.getTeam();
     }
 
     @Override
-    public boolean isOnSameTeam(EntityLivingBase entity) {
-        EntityLivingBase owner = this.getOwner();
+    public boolean isOnSameTeam(LivingEntity entity) {
+        LivingEntity owner = this.getOwner();
         if (entity == owner)
             return true;
         if (owner != null)
@@ -408,7 +408,7 @@ public abstract class EntityUtilityGolem extends EntityGolem implements IEntityO
 
     /// Saves this entity to NBT.
     @Override
-    public void writeEntityToNBT(NBTTagCompound tag) {
+    public void writeEntityToNBT(CompoundNBT tag) {
         super.writeEntityToNBT(tag);
         tag.setBoolean("Sitting", this.isSitting());
         tag.setString("Owner", this.func_152113_b());
@@ -416,15 +416,15 @@ public abstract class EntityUtilityGolem extends EntityGolem implements IEntityO
 
     /// Loads this entity from NBT.
     @Override
-    public void readEntityFromNBT(NBTTagCompound tag) {
-        super.readEntityFromNBT(tag);
+    public void readEntityFromNBT(CompoundNBT tag) {
+        super.read(tag);
         this.sitAI.sit = tag.getBoolean("Sitting");
         this.setSitting(this.sitAI.sit);
         String name = null;
-        if (tag.hasKey("Owner")) {
+        if (tag.hasUniqueId("Owner")) {
             name = tag.getString("Owner");
         }
-        else if (tag.hasKey("owner")) {
+        else if (tag.hasUniqueId("owner")) {
             name = tag.getString("owner");
         }
         if (name == "") {

@@ -1,10 +1,10 @@
 package toast.utilityMobs.block;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.world.World;
 
 public abstract class EntityContainerGolem extends EntityBlockGolem implements IInventory
@@ -112,7 +112,7 @@ public abstract class EntityContainerGolem extends EntityBlockGolem implements I
 
     // Do not make give this method the name canInteractWith because it clashes with Container.
     @Override
-    public boolean isUseableByPlayer(EntityPlayer player) {
+    public boolean isUseableByPlayer(PlayerEntity player) {
         return this.canInteract(player);
     }
 
@@ -162,7 +162,7 @@ public abstract class EntityContainerGolem extends EntityBlockGolem implements I
 
     // Opens this block golem's GUI.
     @Override
-    public boolean openGUI(EntityPlayer player) {
+    public boolean openGUI(PlayerEntity player) {
         if (!this.worldObj.isRemote) {
             player.displayGUIChest(this);
         }
@@ -171,12 +171,12 @@ public abstract class EntityContainerGolem extends EntityBlockGolem implements I
 
     // Saves this entity to NBT.
     @Override
-    public void writeEntityToNBT(NBTTagCompound tag) {
+    public void writeEntityToNBT(CompoundNBT tag) {
         super.writeEntityToNBT(tag);
-        NBTTagList tagList = new NBTTagList();
+        ListNBT tagList = new ListNBT();
         for (int slot = 0; slot < this.contents.length; slot++) {
             if (this.contents[slot] != null) {
-                NBTTagCompound slotTag = new NBTTagCompound();
+                CompoundNBT slotTag = new CompoundNBT();
                 slotTag.setByte("Slot", (byte)slot);
                 this.contents[slot].writeToNBT(slotTag);
                 tagList.appendTag(slotTag);
@@ -187,12 +187,12 @@ public abstract class EntityContainerGolem extends EntityBlockGolem implements I
 
     // Loads this entity from NBT.
     @Override
-    public void readEntityFromNBT(NBTTagCompound tag) {
+    public void readEntityFromNBT(CompoundNBT tag) {
         super.readEntityFromNBT(tag);
-        NBTTagList tagList = tag.getTagList("Items", tag.getId());
+        ListNBT tagList = tag.getTagList("Items", tag.getId());
         this.contents = new ItemStack[this.getSizeInventory()];
         for (int i = 0; i < tagList.tagCount(); i++) {
-            NBTTagCompound slotTag = tagList.getCompoundTagAt(i);
+            CompoundNBT slotTag = tagList.getCompoundTagAt(i);
             int slot = slotTag.getByte("Slot") & 255;
             if (slot >= 0 && slot < this.contents.length) {
                 this.contents[slot] = ItemStack.loadItemStackFromNBT(slotTag);
@@ -201,20 +201,20 @@ public abstract class EntityContainerGolem extends EntityBlockGolem implements I
     }
 
     // Steals the contents of the NBT given.
-    public void takeContentsFromNBT(NBTTagCompound tag) {
-        NBTTagList tagList = tag.getTagList("Items", tag.getId());
+    public void takeContentsFromNBT(CompoundNBT tag) {
+        ListNBT tagList = tag.getTagList("Items", tag.getId());
         this.contents = new ItemStack[this.getSizeInventory()];
         for (int i = 0; i < tagList.tagCount(); i++) {
-            NBTTagCompound slotTag = tagList.getCompoundTagAt(i);
+            CompoundNBT slotTag = tagList.getCompoundTagAt(i);
             int slot = slotTag.getByte("Slot") & 255;
             if (slot >= 0 && slot < this.contents.length) {
                 this.contents[slot] = ItemStack.loadItemStackFromNBT(slotTag);
             }
         }
         tag.setTag("Items", new NBTTagList());
-        if (tag.hasKey("CustomName")) {
+        if (tag.hasUniqueId("CustomName")) {
             this.setCustomNameTag(tag.getString("CustomName"));
         }
-        tag.removeTag("CustomName");
+        tag.remove("CustomName");
     }
 }

@@ -3,20 +3,20 @@ package toast.utilityMobs.ai;
 import java.util.Iterator;
 import java.util.List;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.EntityAIBase;
-import net.minecraft.entity.monster.EntityGolem;
+import net.minecraft.entity.passive.GolemEntity;
 
 public class EntityAIFollowEntity extends EntityAIBase
 {
     private final Class followClass;
     private final float rangeMin, rangeMax;
-    private final EntityGolem golem;
-    private EntityLivingBase followEntity;
+    private final GolemEntity golem;
+    private LivingEntity followEntity;
     private double moveSpeed;
     private boolean isFollowing;
 
-    public EntityAIFollowEntity(EntityGolem entity, Class<? extends EntityLivingBase> target, double speed, float min, float max) {
+    public EntityAIFollowEntity(GolemEntity entity, Class<? extends LivingEntity> target, double speed, float min, float max) {
         this.isFollowing = false;
         this.followEntity = null;
         this.golem = entity;
@@ -39,7 +39,7 @@ public class EntityAIFollowEntity extends EntityAIBase
             if (!itr.hasNext()) {
                 break;
             }
-            this.followEntity = (EntityLivingBase)itr.next();
+            this.followEntity = (LivingEntity) itr.next();
             break;
         }
         while (true);

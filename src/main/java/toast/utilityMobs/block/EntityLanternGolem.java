@@ -2,11 +2,11 @@ package toast.utilityMobs.block;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.IEntityLivingData;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import toast.utilityMobs.TargetHelper;
@@ -51,7 +51,7 @@ public class EntityLanternGolem extends EntityContainerGolem
 
     /// Opens this block golem's GUI.
     @Override
-    public boolean openGUI(EntityPlayer player) {
+    public boolean openGUI(PlayerEntity player) {
         if (!this.worldObj.isRemote) {
             GuiHelper.displayGUICustom(player, this);
         }

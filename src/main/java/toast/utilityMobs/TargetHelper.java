@@ -13,20 +13,16 @@ import java.util.Map;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.IEntityOwnable;
-import net.minecraft.entity.monster.EntitySilverfish;
-import net.minecraft.entity.monster.EntitySkeleton;
-import net.minecraft.entity.monster.EntitySlime;
-import net.minecraft.entity.monster.EntitySpider;
-import net.minecraft.entity.monster.EntityWitch;
-import net.minecraft.entity.monster.EntityZombie;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Items;
+import net.minecraft.entity.monster.*;
+import net.minecraft.entity.monster.SilverfishEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.item.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTTagString;
+import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.StringNBT;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
@@ -72,14 +68,14 @@ public class TargetHelper
             }
             else {
                 this.setPermissions(this.owner, 7);
-                this.whitelist(EntityPlayer.class);
+                this.whitelist(PlayerEntity.class);
                 this.whitelist(EntityUtilityGolem.class);
-                this.whitelist(EntitySilverfish.class);
-                this.whitelist(EntitySkeleton.class);
-                this.whitelist(EntitySlime.class);
-                this.whitelist(EntitySpider.class);
-                this.whitelist(EntityWitch.class);
-                this.whitelist(EntityZombie.class);
+                this.whitelist(SilverfishEntity.class);
+                this.whitelist(SkeletonEntity.class);
+                this.whitelist(SlimeEntity.class);
+                this.whitelist(SpiderEntity.class);
+                this.whitelist(WitchEntity.class);
+                this.whitelist(ZombieEntity.class);
             }
         }
     }
@@ -107,8 +103,8 @@ public class TargetHelper
     }
 
     // Attempts to find the player on the server. Returns null if the player cannot be found.
-    public EntityPlayer getOwner() {
-        EntityPlayer player;
+    public PlayerEntity getOwner() {
+        PlayerEntity player;
         for (World world : FMLCommonHandler.instance().getMinecraftServerInstance().worldServers) {
             player = world.getPlayerEntityByName(this.owner);
             if (player != null)
@@ -129,7 +125,7 @@ public class TargetHelper
         if (TargetHelper.HOSTILE)
             return true;
         else if (!this.permissions.containsKey(username))
-            return !this.isBlacklisted(EntityPlayer.class) && this.isWhitelisted(EntityPlayer.class);
+            return !this.isBlacklisted(PlayerEntity.class) && this.isWhitelisted(PlayerEntity.class);
         else
             return (this.permissions.get(username).byteValue() & TargetHelper.PERMISSION_TARGET) == 0;
     }
@@ -148,7 +144,7 @@ public class TargetHelper
 
     // Returns true if the given entity should continue to be attacked.
     public boolean maintainTarget(Entity entity) {
-        if (!(entity instanceof EntityLivingBase) || !entity.isEntityAlive())
+        if (!(entity instanceof LivingEntity) || !entity.isEntityAlive())
             return false;
         return true;
     }
@@ -162,8 +158,8 @@ public class TargetHelper
         if (entity instanceof IEntityOwnable)
             if (this.owner.equals(((IEntityOwnable)entity).func_152113_b()) || !this.canDamagePlayer(((IEntityOwnable)entity).func_152113_b()))
                 return false;
-        if (entity instanceof EntityPlayer)
-            return this.canDamagePlayer(((EntityPlayer)entity).getCommandSenderName());
+        if (entity instanceof PlayerEntity)
+            return this.canDamagePlayer(((PlayerEntity)entity).getCommandSenderName());
         Class entityClass = entity.getClass();
         if (!this.isBlacklisted(entityClass) && this.isWhitelisted(entityClass))
             return true;
@@ -235,7 +231,7 @@ public class TargetHelper
         }
     }
     public void whitelist(Class entityClass) {
-        if (!this.mobWhitelist.contains(entityClass) && EntityLivingBase.class.isAssignableFrom(entityClass) && this.clearWhitelistFor(entityClass)) {
+        if (!this.mobWhitelist.contains(entityClass) && LivingEntity.class.isAssignableFrom(entityClass) && this.clearWhitelistFor(entityClass)) {
             this.mobWhitelist.add(entityClass);
         }
     }
@@ -637,7 +633,7 @@ public class TargetHelper
     private void readFrom(ItemStack book) {
         if (book == null || book.stackTagCompound == null || !book.stackTagCompound.hasKey("pages"))
             return;
-        NBTTagList pages = book.stackTagCompound.getTagList("pages", new NBTTagString().getId());
+        ListNBT pages = book.stackTagCompound.getTagList("pages", new StringNBT().getId());
         byte id = book.stackTagCompound.getByte("umt");
         String page;
         String line;
@@ -709,18 +705,18 @@ public class TargetHelper
     }
 
     // Updates a target helper based on the entity interacted with.
-    public static void interact(String username, ItemStack book, int id, EntityLivingBase entity, boolean sneaking) {
+    public static void interact(String username, ItemStack book, int id, LivingEntity entity, boolean sneaking) {
         TargetHelper.getTargetHelper(username).interactWith(book, id, entity, sneaking);
     }
-    private void interactWith(ItemStack book, int id, EntityLivingBase entity, boolean sneaking) {
+    private void interactWith(ItemStack book, int id, LivingEntity entity, boolean sneaking) {
         if (id == 0) {
-            if (!(entity instanceof EntityPlayer))
+            if (!(entity instanceof PlayerEntity))
                 return;
-            byte playerPermissions = this.getPermissions(((EntityPlayer)entity).getCommandSenderName());
+            byte playerPermissions = this.getPermissions(((PlayerEntity)entity).getCommandSenderName());
             if (sneaking) {
                 if (playerPermissions > 0) {
                     for (byte permission = TargetHelper.HIGHEST_PERMISSION; permission > 0; permission >>= 1) if ((permission & playerPermissions) > 0) {
-                        this.remPermissions(((EntityPlayer)entity).getCommandSenderName(), permission);
+                        this.remPermissions(((PlayerEntity)entity).getCommandSenderName(), permission);
                         this.save();
                         break;
                     }
@@ -728,7 +724,7 @@ public class TargetHelper
             }
             else {
                 for (byte permission = 1; permission <= TargetHelper.HIGHEST_PERMISSION; permission <<= 1) if ((permission & playerPermissions) == 0) {
-                    this.addPermissions(((EntityPlayer)entity).getCommandSenderName(), permission);
+                    this.addPermissions(((PlayerEntity)entity).getCommandSenderName(), permission);
                     this.save();
                     break;
                 }
@@ -747,12 +743,12 @@ public class TargetHelper
     }
 
     // Called when a player logs in, to send his/her target helper to the server and send the server's handlers to the player.
-    public static void fetchTargetHelpers(EntityPlayer player) {
-        if (FMLCommonHandler.instance().getSide() == Side.SERVER && player instanceof EntityPlayerMP) {
-            _UtilityMobs.CHANNEL.sendTo(new MessageFetchTargetHelper(), (EntityPlayerMP)player);
+    public static void fetchTargetHelpers(PlayerEntity player) {
+        if (FMLCommonHandler.instance().getSide() == Side.SERVER && player instanceof ServerPlayerEntity) {
+            _UtilityMobs.CHANNEL.sendTo(new MessageFetchTargetHelper(), (ServerPlayerEntity)player);
             for (Map.Entry<String, TargetHelper> entry : TargetHelper.TARGET_HELPERS.entrySet()) {
                 if (entry.getKey() != null && !entry.getValue().destroyed()) {
-                    _UtilityMobs.CHANNEL.sendTo(new MessageTargetHelper(entry.getValue()), (EntityPlayerMP)player);
+                    _UtilityMobs.CHANNEL.sendTo(new MessageTargetHelper(entry.getValue()), (ServerPlayerEntity)player);
                 }
             }
         }
@@ -770,8 +766,8 @@ public class TargetHelper
             if (server != null) {
                 for (WorldServer world : server.worldServers) {
                     for (Object entity : new ArrayList(world.playerEntities)) {
-                        if (entity instanceof EntityPlayerMP && !this.owner.equals(((EntityPlayerMP) entity).getCommandSenderName())) {
-                            _UtilityMobs.CHANNEL.sendTo(new MessageTargetHelper(this), (EntityPlayerMP)entity);
+                        if (entity instanceof ServerPlayerEntity && !this.owner.equals(((ServerPlayerEntity) entity).getCommandSenderName())) {
+                            _UtilityMobs.CHANNEL.sendTo(new MessageTargetHelper(this), (ServerPlayerEntity)entity);
                         }
                     }
                 }
@@ -782,7 +778,7 @@ public class TargetHelper
     // Returns a loadable string from the class, if possible.
     private static String classToString(Class entityClass) {
         String name = null;
-        if (entityClass == EntityPlayer.class) {
+        if (entityClass == PlayerEntity.class) {
             name = "Player";
         }
         else {
@@ -803,7 +799,7 @@ public class TargetHelper
     private static Class stringToClass(String line) {
         Class entityClass = null;
         if (line.equals("Player")) {
-            entityClass = EntityPlayer.class;
+            entityClass = PlayerEntity.class;
         }
         else {
             try {

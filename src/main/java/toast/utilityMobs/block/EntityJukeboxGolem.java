@@ -1,8 +1,8 @@
 package toast.utilityMobs.block;
 
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
+import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemRecord;
 import net.minecraft.item.ItemStack;
@@ -65,7 +65,7 @@ public class EntityJukeboxGolem extends EntityBlockGolem
 
     /// Opens this block golem's GUI.
     @Override
-    public boolean openGUI(EntityPlayer player) {
+    public boolean openGUI(PlayerEntity player) {
         if (!this.worldObj.isRemote) {
             ItemStack heldItem = this.getEquipmentInSlot(0);
             if (heldItem != null) {

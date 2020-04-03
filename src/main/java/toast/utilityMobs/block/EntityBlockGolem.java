@@ -1,12 +1,12 @@
 package toast.utilityMobs.block;
 
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.EntityAILookIdle;
+import net.minecraft.entity.ai.goal.LookRandomlyGoal;
 import net.minecraft.entity.ai.EntityAIWander;
 import net.minecraft.entity.ai.EntityAIWatchClosest;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.block.Blocks;
+import net.minecraft.item.Items;
 import net.minecraft.item.Item;
 import net.minecraft.world.World;
 import toast.utilityMobs.TargetHelper;
@@ -25,7 +25,7 @@ public class EntityBlockGolem extends EntityUtilityGolem
         this.tasks.addTask(2, this.aiFollow);
         this.tasks.addTask(3, new EntityAIWander(this, 1.0));
         this.tasks.addTask(4, new EntityAIWatchClosest(this, EntityPlayer.class, 8.0F));
-        this.tasks.addTask(4, new EntityAILookIdle(this));
+        this.tasks.addTask(4, new LookRandomlyGoal(this));
     }
 
     @Override
@@ -56,9 +56,9 @@ public class EntityBlockGolem extends EntityUtilityGolem
     }
 
     @Override
-    public boolean interact(EntityPlayer player) {
+    public boolean interact(PlayerEntity player) {
         if (this.canInteract(player)) {
-            if (player.isSneaking()) {
+            if (player.isCrouching()) {
                 this.sitAI.sit = !this.isSitting();
                 if (!this.sitAI.sit) {
                     this.setClosed();
@@ -76,13 +76,13 @@ public class EntityBlockGolem extends EntityUtilityGolem
     }
 
     /// Opens this block golem's GUI.
-    public boolean openGUI(EntityPlayer player) {
+    public boolean openGUI(PlayerEntity player) {
         return false;
     }
 
     @Override
-    public boolean canInteract(EntityPlayer player) {
-        if (player.isSneaking())
+    public boolean canInteract(PlayerEntity player) {
+        if (player.isCrouching())
             return this.func_152113_b() == "" || this.func_152113_b().equals(player.getCommandSenderName()) || this.targetHelper.playerHasPermission(player.getCommandSenderName(), TargetHelper.PERMISSION_TARGET | TargetHelper.PERMISSION_USE);
         return super.canInteract(player) && player.getDistanceSqToEntity(this) <= 64.0;
     }

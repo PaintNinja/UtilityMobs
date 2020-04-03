@@ -1,13 +1,13 @@
 package toast.utilityMobs.block;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.ContainerRepair;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.container.RepairContainer;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 
-public class ContainerAnvilGolem extends ContainerRepair
+public class ContainerAnvilGolem extends RepairContainer
 {
     // The golem being crafted on.
     public final EntityAnvilGolem golem;
@@ -16,7 +16,7 @@ public class ContainerAnvilGolem extends ContainerRepair
     // Determined by damage of input item and stackSize of repair materials.
     public int stackSizeToBeUsedInRepair;
 
-    public ContainerAnvilGolem(InventoryPlayer inventory, EntityAnvilGolem anvil, EntityPlayer player) {
+    public ContainerAnvilGolem(PlayerInventory inventory, EntityAnvilGolem anvil, PlayerEntity player) {
         super(inventory, anvil.worldObj, -1, -1, -1, player);
         this.golem = anvil;
         this.golem.openInventory();
@@ -29,14 +29,14 @@ public class ContainerAnvilGolem extends ContainerRepair
 
     // Callback for when the crafting gui is closed.
     @Override
-    public void onContainerClosed(EntityPlayer player) {
+    public void onContainerClosed(PlayerEntity player) {
         super.onContainerClosed(player);
         this.golem.closeInventory();
     }
 
     // Returns true if this container can be opened by the player.
     @Override
-    public boolean canInteractWith(EntityPlayer player) {
+    public boolean canInteractWith(PlayerEntity player) {
         return this.golem.isUseableByPlayer(player);
     }
 

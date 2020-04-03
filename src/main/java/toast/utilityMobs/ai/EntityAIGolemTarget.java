@@ -4,19 +4,19 @@ import java.util.Collections;
 import java.util.List;
 
 import net.minecraft.command.IEntitySelector;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.goal.NearestAttackableTargetGoal;
 import toast.utilityMobs.golem.EntityUtilityGolem;
 
-public class EntityAIGolemTarget extends EntityAINearestAttackableTarget
+public class EntityAIGolemTarget extends NearestAttackableTargetGoal
 {
-    private final EntityAINearestAttackableTarget.Sorter sorter;
+    private final NearestAttackableTargetGoal.Sorter sorter;
     private final IEntitySelector targetSelector;
     public final EntityUtilityGolem golem;
-    public EntityLivingBase targetEntity;
+    public LivingEntity targetEntity;
 
     public EntityAIGolemTarget(EntityUtilityGolem entity) {
-        super(entity, EntityLivingBase.class, 0, true, false, (IEntitySelector)null);
+        super(entity, LivingEntity.class, 0, true, false, (IEntitySelector)null);
         this.golem = entity;
         this.sorter = new EntityAINearestAttackableTarget.Sorter(entity);
         this.targetSelector = new EntityAIGolemTargetSelector(entity);
@@ -26,14 +26,14 @@ public class EntityAIGolemTarget extends EntityAINearestAttackableTarget
     @Override
     public boolean shouldExecute() {
         double range = this.getTargetDistance();
-        List entityList = this.golem.worldObj.selectEntitiesWithinAABB(EntityLivingBase.class, this.golem.boundingBox.expand(range, range, range), this.targetSelector);
+        List entityList = this.golem.worldObj.selectEntitiesWithinAABB(LivingEntity.class, this.golem.boundingBox.expand(range, range, range), this.targetSelector);
         Collections.sort(entityList, this.sorter);
 
         if (entityList.isEmpty()) {
             this.targetEntity = null;
             return false;
         }
-        this.targetEntity = (EntityLivingBase)entityList.get(0);
+        this.targetEntity = (LivingEntity) entityList.get(0);
         return true;
     }
 

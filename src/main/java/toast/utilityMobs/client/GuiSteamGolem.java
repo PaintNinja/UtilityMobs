@@ -2,7 +2,7 @@ package toast.utilityMobs.client;
 
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.opengl.GL11;
@@ -16,7 +16,7 @@ public class GuiSteamGolem extends GuiContainer {
     public static final ResourceLocation TEXTURE = new ResourceLocation(_UtilityMobs.MODID.toLowerCase(), "textures/gui/guiSteamGolem.png");
     private EntitySteamGolem steamGolem;
 
-    public GuiSteamGolem(InventoryPlayer player, EntitySteamGolem golem) {
+    public GuiSteamGolem(PlayerInventory player, EntitySteamGolem golem) {
         super(new ContainerSteamGolem(player, golem));
         this.steamGolem = golem;
     }

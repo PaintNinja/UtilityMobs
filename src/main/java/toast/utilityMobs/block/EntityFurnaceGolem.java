@@ -1,14 +1,14 @@
 package toast.utilityMobs.block;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
+import net.minecraft.block.Blocks;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Items;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntityFurnace;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.tileentity.FurnaceTileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import toast.utilityMobs.TargetHelper;
@@ -103,7 +103,7 @@ public class EntityFurnaceGolem extends EntityContainerGolem implements ISidedIn
 
     /// Opens this block golem's GUI.
     @Override
-    public boolean openGUI(EntityPlayer player) {
+    public boolean openGUI(PlayerEntity player) {
         if (!this.worldObj.isRemote) {
             GuiHelper.displayGUIFurnace(player, this);
         }
@@ -132,7 +132,7 @@ public class EntityFurnaceGolem extends EntityContainerGolem implements ISidedIn
         }
         if (!this.worldObj.isRemote) {
             if (this.burnTime == 0 && this.canSmelt()) {
-                this.itemBurnTime = this.burnTime = TileEntityFurnace.getItemBurnTime(this.getStackInSlot(1));
+                this.itemBurnTime = this.burnTime = FurnaceTileEntity.getItemBurnTime(this.getStackInSlot(1));
                 if (this.burnTime > 0 && this.getStackInSlot(1) != null) {
                     this.getStackInSlot(1).stackSize--;
                     if (this.getStackInSlot(1).stackSize == 0) {
@@ -192,7 +192,7 @@ public class EntityFurnaceGolem extends EntityContainerGolem implements ISidedIn
 
     /// Saves this entity to NBT.
     @Override
-    public void writeEntityToNBT(NBTTagCompound tag) {
+    public void writeEntityToNBT(CompoundNBT tag) {
         super.writeEntityToNBT(tag);
         tag.setShort("BurnTime", (short)this.burnTime);
         tag.setShort("CookTime", (short)this.cookTime);
@@ -200,20 +200,20 @@ public class EntityFurnaceGolem extends EntityContainerGolem implements ISidedIn
 
     /// Loads this entity from NBT.
     @Override
-    public void readEntityFromNBT(NBTTagCompound tag) {
+    public void readEntityFromNBT(CompoundNBT tag) {
         super.readEntityFromNBT(tag);
         this.burnTime = tag.getShort("BurnTime");
         this.cookTime = tag.getShort("CookTime");
-        this.itemBurnTime = TileEntityFurnace.getItemBurnTime(this.getStackInSlot(1));
+        this.itemBurnTime = FurnaceTileEntity.getItemBurnTime(this.getStackInSlot(1));
     }
 
     /// Loads this entity from NBT.
     @Override
-    public void takeContentsFromNBT(NBTTagCompound tag) {
+    public void takeContentsFromNBT(CompoundNBT tag) {
         super.takeContentsFromNBT(tag);
         this.burnTime = tag.getShort("BurnTime");
         this.cookTime = tag.getShort("CookTime");
-        this.itemBurnTime = TileEntityFurnace.getItemBurnTime(this.getStackInSlot(1));
+        this.itemBurnTime = FurnaceTileEntity.getItemBurnTime(this.getStackInSlot(1));
         tag.setShort("BurnTime", (short)0);
         tag.setShort("CookTime", (short)0);
     }

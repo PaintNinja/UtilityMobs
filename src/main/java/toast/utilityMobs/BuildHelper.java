@@ -4,16 +4,17 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 import net.minecraft.block.Block;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.IEntityLivingData;
-import net.minecraft.entity.monster.EntityGolem;
-import net.minecraft.entity.monster.EntityIronGolem;
-import net.minecraft.entity.monster.EntitySnowman;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.passive.SnowGolemEntity;
+import net.minecraft.entity.passive.GolemEntity;
+import net.minecraft.entity.passive.IronGolemEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.block.Blocks;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.tileentity.SkullTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntitySkull;
+import net.minecraft.tileentity.SkullTileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.EntityInteractEvent;
@@ -104,13 +105,13 @@ public class BuildHelper
      */
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onEntityInteract(EntityInteractEvent event) {
-        if (event.target instanceof EntityLivingBase && BookHelper.interact(event.entityPlayer, (EntityLivingBase)event.target)) {
+        if (event.target instanceof EntityLivingBase && BookHelper.interact(event.entityPlayer, (LivingEntity) event.target)) {
             event.setCanceled(true);
         }
     }
 
     /// Spawns a golem, if possible.
-    public static boolean place(World world, EntityPlayer player, boolean holdingGolemHead, int x, int y, int z) {
+    public static boolean place(World world, PlayerEntity player, boolean holdingGolemHead, int x, int y, int z) {
         Block block = world.getBlock(x, y, z);
         if (block == Blocks.pumpkin || block == Blocks.lit_pumpkin)
             return BuildHelper.placeGolem(world, player, x, y, z);
@@ -135,7 +136,7 @@ public class BuildHelper
     /// Returns the skull type, since the metadata only returns 1.
     public static int getSkullType(World world, int x, int y, int z) {
         try {
-            return ((TileEntitySkull)world.getTileEntity(x, y, z)).func_145904_a(); // getSkullType
+            return ((SkullTileEntity)world.getTileEntity(x, y, z)).func_145904_a(); // getSkullType
         }
         catch (Exception ex) {
             // Do nothing
@@ -144,7 +145,7 @@ public class BuildHelper
     }
 
     /// Spawns a golem, if possible.
-    public static boolean placeGolem(World world, EntityPlayer player, int x, int y, int z) {
+    public static boolean placeGolem(World world, PlayerEntity player, int x, int y, int z) {
         if (!Properties.getBoolean("golems", "_all"))
             return false;
         EntityUtilityGolem golem;
@@ -271,7 +272,7 @@ public class BuildHelper
     }
 
     /// Spawns a turret, if possible.
-    public static boolean placeTurret(World world, EntityPlayer player, int x, int y, int z) {
+    public static boolean placeTurret(World world, PlayerEntity player, int x, int y, int z) {
         if (!Properties.getBoolean("turrets", "_all"))
             return false;
         EntityUtilityGolem golem;
@@ -407,7 +408,7 @@ public class BuildHelper
     }
 
     /// Spawns a block golem, if possible.
-    public static boolean placeBlock(World world, EntityPlayer player, int x, int y, int z) {
+    public static boolean placeBlock(World world, PlayerEntity player, int x, int y, int z) {
         if (!Properties.getBoolean("blocks", "_all"))
             return false;
         EntityUtilityGolem golem;
@@ -515,7 +516,7 @@ public class BuildHelper
     }
 
     /// Spawns a hostile golem, if possible.
-    public static boolean placeHostile(World world, EntityPlayer player, int x, int y, int z) {
+    public static boolean placeHostile(World world, PlayerEntity player, int x, int y, int z) {
         if (!Properties.getBoolean("hostiles", "_all"))
             return false;
         EntityUtilityGolem golem;
@@ -530,7 +531,7 @@ public class BuildHelper
     }
 
     /// Spawns a golem, if possible.
-    public static boolean placeColossal(World world, EntityPlayer player, int x, int y, int z) {
+    public static boolean placeColossal(World world, PlayerEntity player, int x, int y, int z) {
         if (!Properties.getBoolean("colossals", "_all"))
             return false;
         EntityUtilityGolem golem;
@@ -579,7 +580,7 @@ public class BuildHelper
     }
 
     // Attempts to replace a vanilla golem just placed by the player.
-    public static boolean replaceGolem(World world, EntityPlayer player, int x, int y, int z) {
+    public static boolean replaceGolem(World world, PlayerEntity player, int x, int y, int z) {
         if (!Properties.getBoolean("golems", "_all"))
             return false;
         String owner = null;
@@ -587,11 +588,11 @@ public class BuildHelper
             owner = player.getCommandSenderName();
         }
         for (Object entity : new ArrayList(world.loadedEntityList)) {
-            if (entity instanceof EntityGolem) {
-                EntityGolem golem = (EntityGolem) entity;
+            if (entity instanceof GolemEntity) {
+                GolemEntity golem = (GolemEntity) entity;
                 if (golem.posY == y - 1.95 && golem.posX == x + 0.5 && golem.posZ == z + 0.5) {
                     EntityUtilityGolem newGolem;
-                    if (golem instanceof EntityIronGolem && ((EntityIronGolem)golem).isPlayerCreated()) {
+                    if (golem instanceof IronGolemEntity && ((IronGolemEntity)golem).isPlayerCreated()) {
                         if (!Properties.getBoolean("golems", "UMIronGolem"))
                             return false;
                         newGolem = new EntityUMIronGolem(world);
@@ -600,7 +601,7 @@ public class BuildHelper
                         golem.setDead();
                         return true;
                     }
-                    if (golem instanceof EntitySnowman) {
+                    if (golem instanceof SnowGolemEntity) {
                         if (!Properties.getBoolean("golems", "UMSnowGolem"))
                             return false;
                         newGolem = new EntityUMSnowGolem(world);
@@ -725,10 +726,10 @@ public class BuildHelper
     public static void getContents(World world, EntityContainerGolem golem, int x, int y, int z) {
         TileEntity tileEntity = world.getTileEntity(x, y, z);
         if (tileEntity != null) {
-            NBTTagCompound tag = new NBTTagCompound();
-            tileEntity.writeToNBT(tag);
+            CompoundNBT tag = new CompoundNBT();
+            tileEntity.write(tag);
             golem.takeContentsFromNBT(tag);
-            tileEntity.readFromNBT(tag);
+            tileEntity.read(tag);
         }
     }
 

@@ -2,15 +2,15 @@ package toast.utilityMobs.turret;
 
 import java.util.UUID;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.EntityAILookIdle;
+import net.minecraft.entity.ai.goal.LookRandomlyGoal;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.projectile.EntityArrow;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.ArrowEntity;
+import net.minecraft.block.Blocks;
+import net.minecraft.item.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -48,7 +48,7 @@ public class EntityTurretGolem extends EntityUtilityGolem
         this.equipmentDropChances[0] = 2.0F;
         this.sinks = 1;
         this.tasks.addTask(1, new EntityAITurretAttack(this));
-        this.tasks.addTask(2, new EntityAILookIdle(this));
+        this.tasks.addTask(2, new LookRandomlyGoal(this));
         this.targetTasks.addTask(1, this.targetAI);
         this.updateTurretStats();
     }
@@ -91,7 +91,7 @@ public class EntityTurretGolem extends EntityUtilityGolem
     }
 
     @Override
-    public boolean interact(EntityPlayer player) {
+    public boolean interact(PlayerEntity player) {
         if (!this.canInteract(player))
             return super.interact(player);
         ItemStack playerHeld = player.getEquipmentInSlot(0);
@@ -167,9 +167,9 @@ public class EntityTurretGolem extends EntityUtilityGolem
 
     /// Executes this golem's ranged attack.
     @Override
-    public void doRangedAttack(EntityLivingBase target) {
+    public void doRangedAttack(LivingEntity target) {
         if (!this.worldObj.isRemote) {
-            EntityArrow arrow = new EntityArrow(this.worldObj, this, target, 1.6F, 12.0F);
+            ArrowEntity arrow = new ArrowEntity(this.worldObj, this, target, 1.6F, 12.0F);
             this.targetHelper.setOwned(arrow);
             this.upgrade.applyToArrow(arrow);
             this.worldObj.spawnEntityInWorld(arrow);

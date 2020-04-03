@@ -1,9 +1,9 @@
 package toast.utilityMobs.block;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.tileentity.TileEntityEnderChest;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.tileentity.EnderChestTileEntity;
 
-public class TileEntityEnderChestProxy extends TileEntityEnderChest
+public class TileEntityEnderChestProxy extends EnderChestTileEntity
 {
     EntityContainerGolem golem;
 
@@ -31,7 +31,7 @@ public class TileEntityEnderChestProxy extends TileEntityEnderChest
 
     // Do not make give this method the name canInteractWith because it clashes with Container.
     @Override
-    public boolean func_145971_a(EntityPlayer player) {
+    public boolean func_145971_a(PlayerEntity player) {
         return this.golem.isUseableByPlayer(player);
     }
 }
